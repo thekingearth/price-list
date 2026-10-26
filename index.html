@@ -1,0 +1,86 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<base target="_top">
+<style>
+  body {
+    background-color: #224;
+    font-family: Arial, sans-serif;
+    margin: 10px;
+    color: #eee;
+  }
+  .table-container {
+    width: 100%;
+    overflow: auto;
+    max-height: 90vh;
+  }
+  table {
+    border-collapse: collapse;
+    white-space: nowrap;
+  }
+  td {
+    border: 1px solid #ccc;
+    padding: 6px 10px;
+  }
+  tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  #status {
+    margin-bottom: 10px;
+  }
+</style>
+</head>
+  <body>
+    <div id="status">Memuat data...</div>
+    <div class="table-container">
+      <table id="tabelData"></table>
+    </div>
+<script>
+  google.script.run .withSuccessHandler(
+    function(data) {
+      const tabel = document.getElementById('tabelData');
+      const fragment = document.createDocumentFragment();
+      data.forEach(function(baris) {
+        const tr = document.createElement('tr');
+        baris.forEach(function(nilai) {
+          const td = document.createElement('td');
+          td.textContent = nilai;
+          tr.appendChild(td);
+        });
+        fragment.appendChild(tr);
+      });
+      tabel.appendChild(fragment);
+      document.getElementById('status').textContent = 'Data berhasil dimuat: ' + data.length + ' baris × ' + (data[0] ? data[0].length : 0) + ' kolom';
+    }
+  )
+    .withFailureHandler(function(error) {
+      document.getElementById('status').textContent = 'Gagal mengambil data: ' + error.message; 
+      })
+    .getData();
+      
+setInterval(function() {
+  google.script.run
+    .withSuccessHandler(function(data) {
+      const tabel = document.getElementById('tabelData');
+      tabel.replaceChildren();
+
+      data.forEach(function(baris) {
+        const tr = document.createElement('tr');
+
+        baris.forEach(function(nilai) {
+          const td = document.createElement('td');
+          td.textContent = nilai;
+          tr.appendChild(td);
+        });
+
+        tabel.appendChild(tr);
+      });
+    })
+    .getData();
+}, 5000);
+
+</script>
+    
+</body>
+</html>
